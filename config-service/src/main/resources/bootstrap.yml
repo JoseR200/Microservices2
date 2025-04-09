@@ -1,2 +1,10 @@
 server:
   port: 8081
+
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/JoseR200/Microservices2.git
+          search-paths: config-data
