@@ -4,6 +4,7 @@ import com.econofood.shopping_microservice.client.ProductClient;
 import com.econofood.shopping_microservice.entity.Invoice;
 import com.econofood.shopping_microservice.model.Product;
 import com.econofood.shopping_microservice.repository.InvoiceRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @CircuitBreaker(name = "productClient", fallbackMethod = "fallbackListAllCategories")
     public List<Invoice> listAllCategories() {
         List<Invoice> invoices = invoiceRepository.findAll();
 
@@ -33,6 +35,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @CircuitBreaker(name = "productClient", fallbackMethod = "fallbackGetInvoice")
     public Invoice getInvoice(Long id) {
         Invoice invoice = invoiceRepository.findById(id).orElse(null);
 
@@ -40,6 +43,30 @@ public class InvoiceServiceImpl implements InvoiceService {
             Product product = productClient.getProductById(invoice.getProductId()).getBody();
             invoice.setProduct(product);
         }
+        return invoice;
+    }
+
+    public List<Invoice> fallbackListAllCategories(Throwable t) {
+        List<Invoice> invoices = invoiceRepository.findAll();
+
+        invoices.forEach(invoice -> {
+            Product product = Product.builder()
+                    .build();
+            invoice.setProduct(product);
+        });
+
+        return invoices;
+    }
+
+    public Invoice fallbackGetInvoice(Long id, Throwable t) {
+        Invoice invoice = invoiceRepository.findById(id).orElse(null);
+
+        if (invoice != null) {
+            Product product = Product.builder()
+                    .build();
+            invoice.setProduct(product);
+        }
+
         return invoice;
     }
 
