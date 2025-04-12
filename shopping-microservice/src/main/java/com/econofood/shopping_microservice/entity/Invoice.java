@@ -1,5 +1,6 @@
 package com.econofood.shopping_microservice.entity;
 
+import com.econofood.shopping_microservice.model.Product;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,4 +19,7 @@ public class Invoice {
 
     @Column(name = "product_id")
     private Long productId;
+
+    @Transient
+    private Product product;
 }
