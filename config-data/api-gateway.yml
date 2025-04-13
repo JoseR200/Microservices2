@@ -5,3 +5,53 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8099/eureka/
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: categories
+          uri: lb://product-microservice
+          predicates:
+            - Path=/microservice-product/categories/**
+          filters:
+            - RewritePath=/microservice-product/categories, /categories
+        - id: products
+          uri: lb://product-microservice
+          predicates:
+            - Path=/microservice-product/products/**
+          filters:
+            - RewritePath=/microservice-product/products, /products
+        - id: invoices
+          uri: lb://shopping-microservice
+          predicates:
+            - Path=/microservice-shopping/invoices/**
+          filters:
+            - RewritePath=/microservice-shopping/invoices, /invoices
+        - id: product-swagger
+          uri: lb://product-microservice
+          predicates:
+            - Path=/product/v3/api-docs
+          filters:
+            - RewritePath=/product/v3/api-docs, /v3/api-docs
+        - id: shopping-swagger
+          uri: lb://shopping-microservice
+          predicates:
+            - Path=/shopping/v3/api-docs
+          filters:
+            - RewritePath=/shopping/v3/api-docs, /v3/api-docs
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    urls:
+      - url: /product/v3/api-docs
+        name: Product Service
+      - url: /shopping/v3/api-docs
+        name: Shopping Service
