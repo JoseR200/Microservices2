@@ -5,3 +5,29 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8099/eureka/
+
+spring:
+  cloud:
+    gateway:
+    discovery:
+      locator:
+        enabled: true
+    routes:
+      - id: categories
+        uri: lb://product-microservice
+        predicates:
+          - Path=/microservice-product/categories/**
+        filters:
+          - RewritePath=/microservice-product/categories, /categories
+      - id: products
+        uri: lb://product-microservice
+        predicates:
+          - Path=/microservice-product/products/**
+        filters:
+          - RewritePath=/microservice-product/products, /products
+      - id: invoices
+        uri: lb://shopping-microservice
+        predicates:
+          - Path=/microservice-shopping/invoices/**
+        filters:
+          - RewritePath=/microservice-shopping/invoices, /invoices
