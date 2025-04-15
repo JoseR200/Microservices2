@@ -1,14 +1,9 @@
 spring:
   profiles:
-    active: prod
+    active: ${ENVIRONMENT}
   application:
     name: product-microservice
   cloud:
     config:
-      uri: http://config-service:8081
       username: root
       password: s3cr3t
-  boot:
-    admin:
-      client:
-        url: http://admin-service:8086
