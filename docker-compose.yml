@@ -1,0 +1,70 @@
+services:
+  config-service:
+    build: ./config-service
+    container_name: config-service
+    ports:
+      - "8081:8081"
+    networks:
+      - microservices-network
+    environment:
+      - GIT_USER=${GIT_USER}
+      - GIT_PASSWORD=${GIT_PASSWORD}
+
+  eureka-service:
+    build: ./eureka-service
+    container_name: eureka-service
+    ports:
+      - "8099:8099"
+    networks:
+      - microservices-network
+    depends_on:
+      - config-service
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    networks:
+      - microservices-network
+    depends_on:
+      - config-service
+      - eureka-service
+
+  product-microservice:
+    build: ./product-microservice
+    container_name: product-microservice
+    ports:
+      - "8091:8091"
+    networks:
+      - microservices-network
+    depends_on:
+      - config-service
+      - eureka-service
+
+  shopping-microservice:
+    build: ./shopping-microservice
+    container_name: shopping-microservice
+    ports:
+      - "8092:8092"
+    networks:
+      - microservices-network
+    depends_on:
+      - config-service
+      - eureka-service
+
+  admin-service:
+    build: ./admin-service
+    container_name: admin-service
+    ports:
+      - "8086:8086"
+    depends_on:
+      - config-service
+      - product-microservice
+      - shopping-microservice
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
