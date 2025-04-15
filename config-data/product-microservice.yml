@@ -8,11 +8,6 @@ spring:
       ddl-auto: update
     open-in-view: false
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://eureka-service:8099/eureka/
-
 management:
   endpoints:
     web:
