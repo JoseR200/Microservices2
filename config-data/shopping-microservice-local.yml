@@ -6,6 +6,9 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 eureka:
+  instance:
+    hostname: localhost
+    prefer-ip-address: false
   client:
     service-url:
       defaultZone: http://localhost:8099/eureka/
