@@ -9,6 +9,11 @@ services:
     environment:
       - GIT_USER=${GIT_USER}
       - GIT_PASSWORD=${GIT_PASSWORD}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   eureka-service:
     build: ./eureka-service
@@ -18,18 +23,33 @@ services:
     networks:
       - microservices-network
     depends_on:
-      - config-service
+      config-service:
+        condition: service_healthy
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8099/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  api-gateway:
-    build: ./api-gateway
-    container_name: api-gateway
+  admin-service:
+    build: ./admin-service
+    container_name: admin-service
     ports:
-      - "8080:8080"
+      - "8086:8086"
     networks:
       - microservices-network
     depends_on:
-      - config-service
-      - eureka-service
+      config-service:
+        condition: service_healthy
+      eureka-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   product-microservice:
     build: ./product-microservice
@@ -39,8 +59,14 @@ services:
     networks:
       - microservices-network
     depends_on:
-      - config-service
-      - eureka-service
+      config-service:
+        condition: service_healthy
+      eureka-service:
+        condition: service_healthy
+      admin-service:
+        condition: service_healthy
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
 
   shopping-microservice:
     build: ./shopping-microservice
@@ -50,20 +76,31 @@ services:
     networks:
       - microservices-network
     depends_on:
-      - config-service
-      - eureka-service
+      config-service:
+        condition: service_healthy
+      eureka-service:
+        condition: service_healthy
+      admin-service:
+        condition: service_healthy
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
 
-  admin-service:
-    build: ./admin-service
-    container_name: admin-service
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
     ports:
-      - "8086:8086"
-    depends_on:
-      - config-service
-      - product-microservice
-      - shopping-microservice
+      - "8080:8080"
     networks:
       - microservices-network
+    depends_on:
+      config-service:
+        condition: service_healthy
+      eureka-service:
+        condition: service_healthy
+      admin-service:
+        condition: service_healthy
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
 
 networks:
   microservices-network:
