@@ -16,7 +16,7 @@ For further reference, please consider the following sections:
 ### Additional Links
 These additional references should also help you:
 
-Test to change admin-service to see an jar at home fixed 5.0
+Test to change admin-service to see an jar at home fixed 6.0 maybe final
 
 * [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
 
