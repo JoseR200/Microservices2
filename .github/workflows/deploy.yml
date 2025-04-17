@@ -1,0 +1,14 @@
+name: Test EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-connection:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Chequear conexión con el repositorio
+        run: echo "Hola! Esto es solo una prueba."
