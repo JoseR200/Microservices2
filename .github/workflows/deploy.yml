@@ -66,43 +66,189 @@ jobs:
             rm -r admin.jar/
             cd Microservices2
             docker-compose up --build --detach admin-service
+            docker image prune -f
 
   deploy_apigateway:
     needs: detectar-cambios
     if: needs.detectar-cambios.outputs.apigateway == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Desplegar Api Gateway en EC2
-        run: echo "Deploying Api Gateway..."
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Construir el .jar
+        working-directory: api-gateway
+        run: |
+          chmod +x gradlew
+          ./gradlew clean build -x test
+
+      - name: Enviar .jar a EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ${{ secrets.EC2_USER }}
+          host: ${{ secrets.EC2_HOST }}
+          source: "/home/runner/work/Microservices2/Microservices2/api-gateway/build/libs/api-gateway-0.0.1-SNAPSHOT.jar"
+          target: "/home/ec2-user/api.jar"
+
+      - name: Conexión SSH al servidor EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ${{ secrets.EC2_USER }}
+          host: ${{ secrets.EC2_HOST }}
+          script: |
+            cd /home/ec2-user
+            mv ./api.jar/github/workspace/api-gateway/build/libs/api-gateway-0.0.1-SNAPSHOT.jar ./Microservices2/api-gateway/build/libs/
+            rm -r api.jar/
+            cd Microservices2
+            docker-compose up --build --detach api-gateway
+            docker image prune -f
 
   deploy_config:
     needs: detectar-cambios
     if: needs.detectar-cambios.outputs.config == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Desplegar Config en EC2
-        run: echo "Deploying Config Service..."
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Construir el .jar
+        working-directory: config-service
+        run: |
+          chmod +x gradlew
+          ./gradlew clean build -x test
+
+      - name: Enviar .jar a EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ${{ secrets.EC2_USER }}
+          host: ${{ secrets.EC2_HOST }}
+          source: "/home/runner/work/Microservices2/Microservices2/config-service/build/libs/config-service-0.0.1-SNAPSHOT.jar"
+          target: "/home/ec2-user/config.jar"
+
+      - name: Conexión SSH al servidor EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ${{ secrets.EC2_USER }}
+          host: ${{ secrets.EC2_HOST }}
+          script: |
+            cd /home/ec2-user
+            mv ./config.jar/github/workspace/config-service/build/libs/config-service-0.0.1-SNAPSHOT.jar ./Microservices2/config-service/build/libs/
+            rm -r config.jar/
+            cd Microservices2
+            docker-compose up --build --detach config-service
+            docker image prune -f
 
   deploy_eureka:
     needs: detectar-cambios
     if: needs.detectar-cambios.outputs.eureka == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Desplegar Eureka en EC2
-        run: echo "Deploying Eureka Service..."
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Construir el .jar
+        working-directory: eureka-service
+        run: |
+          chmod +x gradlew
+          ./gradlew clean build -x test
+
+      - name: Enviar .jar a EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ${{ secrets.EC2_USER }}
+          host: ${{ secrets.EC2_HOST }}
+          source: "/home/runner/work/Microservices2/Microservices2/eureka-service/build/libs/eureka-service-0.0.1-SNAPSHOT.jar"
+          target: "/home/ec2-user/eureka.jar"
+
+      - name: Conexión SSH al servidor EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ${{ secrets.EC2_USER }}
+          host: ${{ secrets.EC2_HOST }}
+          script: |
+            cd /home/ec2-user
+            mv ./eureka.jar/github/workspace/eureka-service/build/libs/eureka-service-0.0.1-SNAPSHOT.jar ./Microservices2/eureka-service/build/libs/
+            rm -r eureka.jar/
+            cd Microservices2
+            docker-compose up --build --detach eureka-service
+            docker image prune -f
 
   deploy_product:
     needs: detectar-cambios
     if: needs.detectar-cambios.outputs.product == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Desplegar Product en EC2
-        run: echo "Deploying Product Microservice..."
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Construir el .jar
+        working-directory: product-microservice
+        run: |
+          chmod +x gradlew
+          ./gradlew clean build -x test
+
+      - name: Enviar .jar a EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ${{ secrets.EC2_USER }}
+          host: ${{ secrets.EC2_HOST }}
+          source: "/home/runner/work/Microservices2/Microservices2/product-microservice/build/libs/product-microservice-0.0.1-SNAPSHOT.jar"
+          target: "/home/ec2-user/product.jar"
+
+      - name: Conexión SSH al servidor EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ${{ secrets.EC2_USER }}
+          host: ${{ secrets.EC2_HOST }}
+          script: |
+            cd /home/ec2-user
+            mv ./product.jar/github/workspace/product-microservice/build/libs/product-microservice-0.0.1-SNAPSHOT.jar ./Microservices2/product-microservice/build/libs/
+            rm -r product.jar/
+            cd Microservices2
+            docker-compose up --build --detach product-microservice
+            docker image prune -f
 
   deploy_shopping:
     needs: detectar-cambios
     if: needs.detectar-cambios.outputs.shopping == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Desplegar Shopping en EC2
-        run: echo "Deploying Shopping Microservice..."
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Construir el .jar
+        working-directory: shopping-microservice
+        run: |
+          chmod +x gradlew
+          ./gradlew clean build -x test
+
+      - name: Enviar .jar a EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ${{ secrets.EC2_USER }}
+          host: ${{ secrets.EC2_HOST }}
+          source: "/home/runner/work/Microservices2/Microservices2/shopping-microservice/build/libs/shopping-microservice-0.0.1-SNAPSHOT.jar"
+          target: "/home/ec2-user/shopping.jar"
+
+      - name: Conexión SSH al servidor EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ${{ secrets.EC2_USER }}
+          host: ${{ secrets.EC2_HOST }}
+          script: |
+            cd /home/ec2-user
+            mv ./shopping.jar/github/workspace/shopping-microservice/build/libs/shopping-microservice-0.0.1-SNAPSHOT.jar ./Microservices2/shopping-microservice/build/libs/
+            rm -r shopping.jar/
+            cd Microservices2
+            docker-compose up --build --detach shopping-microservice
+            docker image prune -f
