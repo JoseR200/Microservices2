@@ -52,7 +52,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           host: ${{ secrets.EC2_HOST }}
           source: "/home/runner/work/Microservices2/Microservices2/admin-service/build/libs/admin-service-0.0.1-SNAPSHOT.jar"
-          target: "/home/ec2-user/auth.jar"
+          target: "/home/ec2-user/admin.jar"
 
       - name: Conexión SSH al servidor EC2
         uses: appleboy/ssh-action@v1.0.0
@@ -60,7 +60,12 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           username: ${{ secrets.EC2_USER }}
           host: ${{ secrets.EC2_HOST }}
-          script: ls /home/ec2-user
+          script: |
+            cd /home/ec2-user
+            mv ./admin.jar/github/workspace/admin-service/build/libs/admin-service-0.0.1-SNAPSHOT.jar ./Microservices2/admin-service/build/libs/
+            rm -r admin.jar/
+            cd Microservices2
+            docker-compose up --build --detach admin-service
 
   deploy_apigateway:
     needs: detectar-cambios
