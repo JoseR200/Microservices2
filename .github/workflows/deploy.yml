@@ -36,8 +36,16 @@ jobs:
     if: needs.detectar-cambios.outputs.admin == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Desplegar Admin en EC2
-        run: echo "Deploying Admin Service..."
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Conexión SSH al servidor EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ${{ secrets.EC2_USER }}
+          host: ${{ secrets.EC2_HOST }}
+          script: echo "Conexión establecida"
 
   deploy_apigateway:
     needs: detectar-cambios
