@@ -48,8 +48,9 @@ jobs:
       - name: Enviar el .jar a EC2
         working-directory: admin-service
         run: |
-          ls ./build/libs/
-          scp -i ${{ secrets.EC2_SSH_KEY }} ./build/libs/admin-service-0.0.1-SNAPSHOT.jar ${{ secrets.EC2_USER }}r@${{ secrets.EC2_HOST }}:/home/ec2-user/auth.jar
+          echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+          scp -i key.pem ./build/libs/admin-service-0.0.1-SNAPSHOT.jar ${{ secrets.EC2_USER }}r@${{ secrets.EC2_HOST }}:/home/ec2-user/auth.jar
 
       - name: Conexión SSH al servidor EC2
         uses: appleboy/ssh-action@v1.0.0
