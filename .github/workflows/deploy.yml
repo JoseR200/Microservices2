@@ -6,6 +6,17 @@ on:
       - main
 
 jobs:
+  obtener-cambios:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Conexión SSH al servidor EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ${{ secrets.EC2_USER }}
+          host: ${{ secrets.EC2_HOST }}
+          script: git pull origin main
+
   detectar-cambios:
     runs-on: ubuntu-latest
     outputs:
@@ -39,13 +50,20 @@ jobs:
       - name: Clonar el repositorio
         uses: actions/checkout@v3
 
+      - name: Construir el .jar
+        working-directory: admin-service
+        run: ./gradlew clean build -x test
+
+      - name: Enviar el .jar a EC2
+        run: scp -i ${{ secrets.EC2_SSH_KEY }} admin-service/build/libs/admin-service-0.0.1-SNAPSHOT-plain.jar ${{ secrets.EC2_USER }}r@${{ secrets.EC2_HOST }}:/home/ec2-user/auth.jar
+
       - name: Conexión SSH al servidor EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
           key: ${{ secrets.EC2_SSH_KEY }}
           username: ${{ secrets.EC2_USER }}
           host: ${{ secrets.EC2_HOST }}
-          script: echo "Conexión establecida"
+          script: ls /home/ec2-user
 
   deploy_apigateway:
     needs: detectar-cambios
