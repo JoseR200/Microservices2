@@ -78,6 +78,8 @@ jobs:
 
       - name: Construir el .jar
         working-directory: api-gateway
+        env:
+          ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
@@ -115,6 +117,9 @@ jobs:
 
       - name: Construir el .jar
         working-directory: config-service
+        env:
+          GIT_USER: ${{ secrets.GIT_USER }}
+          GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
@@ -152,6 +157,8 @@ jobs:
 
       - name: Construir el .jar
         working-directory: eureka-service
+        env:
+          ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
@@ -189,6 +196,8 @@ jobs:
 
       - name: Construir el .jar
         working-directory: product-microservice
+        env:
+          ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
@@ -226,6 +235,8 @@ jobs:
 
       - name: Construir el .jar
         working-directory: shopping-microservice
+        env:
+          ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
